@@ -175,6 +175,9 @@
       // 这里再发一条带 engine 标识的；bridge 对 READY 不做 seq 校验，
       // 谁先到都能正确 resolve 加载 Promise。
       self.postMessage({ type: 'READY', engine: 'pikafish' });
+      // 走到这里说明 pre-js 已经把权重写进 MEMFS、垫片也早已被服务过，
+      // 内存里那份可以直接放掉了（见 releaseNnueBytes 的注释）
+      releaseNnueBytes();
       return;
     }
 
@@ -489,12 +492,28 @@
     }
   }
 
+  /**
+   * 放掉内存中那份权重字节。
+   *
+   * ⚠️ **调用时机很关键，早一步都会出事**。pre-js 取权重的那次 `fetch` 发生在
+   * 它自己的 `postRun` 里 —— 也就是说 `importScripts('pikafish-engine.js')` 返回时
+   * 那次 fetch **还没发生**。如果在 `bootEngine()` 之后立刻把 `nnueBytesPromise`
+   * 置空，垫片会当成"第一次请求"再走一遍 loadNnueBytes：
+   *   · 缓存命中时 → 白读一遍 49MB 进内存；
+   *   · **缓存未命中时 → 再下一遍 49MB**（`cache.put` 可能还没落盘，
+   *     `readCachedBytes` 返回 null 就直接走网络）。
+   * 后者正是"内存里留一份"要防的那个竞态。
+   *
+   * 所以放到收到 `readyok` 再放 —— 那时 pre-js 早就把权重写进 MEMFS 了，
+   * 垫片也已经被服务过，内存里这份纯属多余（49MB 常驻对移动端不友好）。
+   */
+  function releaseNnueBytes() {
+    nnueBytesPromise = null;
+  }
+
   loadNnueBytes(nnueUrl())
     .then(function () {
       bootEngine();
-      // 字节已经进了 Emscripten 的 MEMFS，worker 里这一份可以放掉了，
-      // 免得 49MB 常驻（移动端内存本来就紧张）
-      nnueBytesPromise = null;
     })
     .catch(function (err) {
       self.postMessage({
