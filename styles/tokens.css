@@ -1,0 +1,34 @@
+:root {
+  /* 颜色 Token (基于 ui_example 深色科技风与红木象棋配色的结合) */
+  --color-bg-primary: #727272;
+  --color-panel-bg: #20242b;
+  --color-panel-border: rgba(255, 255, 255, 0.08);
+  --color-panel-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+  
+  --color-text-main: #e8eaef;
+  --color-text-muted: #aeb5c2;
+  --color-text-dark: #333333;
+  --color-text-light: #ffffff;
+  
+  --color-score-positive: #78c7ff;
+  --color-score-negative: #ffd36b;
+  --color-score-neutral: #e8eaef;
+  
+  --color-source-ai: #78c7ff;
+  --color-source-human: #f4d06f;
+
+  /* 尺寸 Token */
+  --board-size: 600px;
+  --board-border-size: calc(var(--board-size) / 60);
+  --panel-width: min(540px, calc(100vw - 32px));
+  --panel-height: calc(var(--board-size) + (var(--board-border-size) * 6));
+  
+  /* 阴影与圆角 Token */
+  --radius-card: 12px;
+  --radius-btn: 6px;
+  --radius-badge: 50%;
+  
+  /* 动画 Token */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

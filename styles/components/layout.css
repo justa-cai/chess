@@ -1,0 +1,40 @@
+#content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1240px;
+  padding: 0 16px;
+}
+
+#content #content-title {
+  width: var(--board-size);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+#game-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 34px;
+  width: 100%;
+}
+
+/* 响应式适配：移动端或小屏幕下自适应切换为单列垂直排列 */
+@media (max-width: 1200px) {
+  #content #content-title {
+    width: 100%;
+    max-width: var(--board-size);
+  }
+  
+  #game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+}

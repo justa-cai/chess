@@ -1,0 +1,25 @@
+# 参考与第三方范例目录 (仅本地参考，不入库)
+ui_example
+ui_example/
+ui-example
+ui-example/
+third-party/xiangqi.js
+third-party/xiangqi.js/
+third-party/xiangqiboardjs
+third-party/xiangqiboardjs/
+
+# 依赖与编译产出
+node_modules/
+dist/
+build/
+
+# 系统与编辑器缓存
+__pycache__/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# playwright-cli 调试产物
+.playwright-cli/

@@ -1,0 +1,84 @@
+/* 对局总结浮层 */
+#game-summary {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-panel-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-card);
+  padding: 32px 48px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+#game-summary-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+#restartbtn,
+#undobtn {
+  padding: 10px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  background: #8c2d19;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background var(--transition-fast);
+}
+
+#restartbtn:hover,
+#undobtn:hover {
+  background: #a3351e;
+}
+
+#undobtn {
+  background: #3a3f47;
+}
+
+#undobtn:hover {
+  background: #4a505a;
+}
+
+/* 底部说明区块 */
+#engine-note {
+  margin-top: 32px;
+  max-width: 880px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#engine-note .engine-tech {
+  margin-bottom: 6px;
+  color: var(--color-text-main);
+}
+
+#engine-note .engine-links {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#engine-note .engine-links a {
+  color: var(--color-score-positive);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+#engine-note .engine-links a:hover {
+  color: #a3d8ff;
+  text-decoration: underline;
+}

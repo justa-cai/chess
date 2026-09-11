@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国象棋 AI · 六档难度 · 双引擎（内置 JS + Pikafish WASM/NNUE）</title>
+    <link rel="icon" href="data:,">
+    <script src="./coi-serviceworker.js"></script>
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+    <div id="content">
+        <!-- 顶部大号标题与巨型比分徽章栏 -->
+        <div id="content-title" class="dfr aic jcsb">
+            <div id="black-counter" class="dfr aic jcc title-counter">
+                <span id="black-score" class="title-counter-data">AI</span>
+            </div>
+
+            <div class="dfc aic jcc">
+                <h1 id="title" class="dfr aic jcc">
+                    <span class="title-red">中</span>
+                    <span class="title-black">国</span>
+                    <span class="title-red">象</span>
+                    <span class="title-black">棋</span>
+                </h1>
+                <div class="title-sub-badge" style="font-size: 13px; color: #e2e8f0; margin-top: 4px; font-weight: 600; letter-spacing: 0.5px;">WASM 多线程 + NNUE 神经网络 · 超人类极峰</div>
+            </div>
+
+            <div id="red-counter" class="dfr aic jcc title-counter">
+                <span id="red-score" class="title-counter-data">玩家</span>
+            </div>
+        </div>
+
+        <!-- 游戏主对局与侧边栏布局 -->
+        <div id="game-layout">
+            <!-- 棋盘与多级菜单外框 -->
+            <div id="border-frame" class="dfr aic jcc">
+                <!-- 浮动多级菜单遮罩 -->
+                <div id="board-options" class="dfr aic jcc">
+                    <!-- 主菜单 -->
+                    <div id="menu" class="board-option-type dfr aic jcc">
+                        <div id="menu-content" class="board-option-type-content dfr aic jcc">
+                            <div id="startbtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>开始</h1>
+                            </div>
+                            <div id="helpbtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>说明</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模式选择菜单 -->
+                    <div id="menu-mode" class="board-option-type dfr aic jcc hide">
+                        <div id="menu-mode-content" class="board-option-type-content dfr aic jcc">
+                            <div id="pvpbtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>本机双人</h1>
+                            </div>
+                            <div id="pvebtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>人机对战</h1>
+                            </div>
+                            <div id="evebtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>机机对战</h1>
+                            </div>
+                        </div>
+                        <div class="returnbtn board-option-type-btn dfr aic jcc" id="return-to-main">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 人机先手选择菜单 -->
+                    <div id="menu-mode-pve" class="board-option-type dfr aic jcc hide">
+                        <div id="menu-mode-content" class="board-option-type-content dfr aic jcc">
+                            <div id="pfbtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>玩家先走(执红)</h1>
+                            </div>
+                            <div id="efbtn" class="board-option-type-btn dfr aic jcc">
+                                <h1>电脑先走(执黑)</h1>
+                            </div>
+                        </div>
+                        <div class="returnbtn board-option-type-btn dfr aic jcc" id="return-to-mode">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 难度选择菜单。档位 1~3 由内置 JS 引擎承担（零下载、点开即玩），
+                         档位 4~6 才需要下载 Pikafish 的 49MB 权重 -->
+                    <div id="menu-level" class="board-option-type dfr aic jcc hide">
+                        <div id="menu-level-content" class="board-option-type-content dfr aic jcc">
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="1"><h1>入门</h1></div>
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="2"><h1>初级</h1></div>
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="3"><h1>中级</h1></div>
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="4"><h1>高级</h1></div>
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="5"><h1>大师</h1></div>
+                            <div class="board-option-type-btn dfr aic jcc level-btn" data-level="6"><h1>宗师</h1></div>
+                        </div>
+                        <div id="menu-level-hint">档位 1~3 使用内置引擎，即时开局；4~6 需首次下载 49MB 神经网络权重</div>
+                        <div class="returnbtn board-option-type-btn dfr aic jcc" id="return-from-level">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 中国象棋渲染容器 -->
+                <div id="board-container"></div>
+            </div>
+
+            <!-- 侧边 AI 搜索评分日志面板 -->
+            <aside id="ai-panel">
+                <div id="ai-panel-title">AI 搜索评分</div>
+                <div id="ai-panel-subtitle">记录每一步的搜索深度、节点数、耗时、NPS 和 UCI 评估分数。</div>
+
+                <!-- 对局操作区 -->
+                <div id="ai-controls">
+                    <button id="undo-btn" type="button">悔棋</button>
+                    <button id="restart-btn" type="button">重开</button>
+                    <span id="level-badge">难度：中级</span>
+                </div>
+
+                <!-- 引擎加载进度。档位 4~6 首次使用需要下载 49MB 神经网络权重，
+                     这里显示真实进度（由 Worker 的流式读取上报），不是假动画 -->
+                <div id="engine-progress" class="hide">
+                    <div id="engine-progress-track"><div id="engine-progress-bar"></div></div>
+                    <div id="engine-progress-text">正在准备引擎…</div>
+                </div>
+
+                <div id="ai-table-wrap">
+                    <table id="ai-stats-table">
+                        <thead>
+                            <tr id="ai-stats-header">
+                                <th>#</th>
+                                <th>方</th>
+                                <th>来源</th>
+                                <th>落子</th>
+                                <th>节点</th>
+                                <th>NPS</th>
+                                <th>耗时</th>
+                                <th>分数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-stats-body">
+                            <tr id="ai-stats-empty">
+                                <td colspan="8">等待对局开始。开局后显示实时搜索统计</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="ai-current">等待对局开始。</div>
+            </aside>
+        </div>
+
+        <!-- 对局总结浮层 -->
+        <div id="game-summary" class="hide">
+            <span id="game-summary-text">红方胜！</span>
+            <button id="restartbtn" type="button">再来一局</button>
+            <button id="undobtn" type="button">悔棋</button>
+        </div>
+
+        <!-- 底部全套硬核技术栈说明区块 -->
+        <div id="engine-note">
+            <p class="engine-tech">难度分六档，跨两个引擎：1~3 档由内置的纯 JavaScript 引擎（Wukong）即时应着，无需任何下载；4~6 档切换到 Pikafish 引擎——它以 Emscripten 编译为 WebAssembly，采用 NNUE 神经网络评估（HalfKA_v2_hm 特征网）与 pthread 多线程 Alpha-Beta/PVS 搜索，首次使用需下载一次 49MB 权重，之后由浏览器缓存复用。Pikafish 本身没有难度选项（不含 Skill Level / UCI_Elo），4 档的"弱"由应用自己造：用 MultiPV 取多个候选着法，再按厘分 softmax 温度采样，只走次优不送子。引擎在独立 Web Worker 中运行，主界面始终保持流畅；搜索统计（深度、节点数、NPS、耗时、评估分）全部来自引擎的真实输出，没有一处是伪造的。</p>
+        </div>
+
+    </div>
+
+    <!-- 脚本引入 -->
+    <script src="./js/difficulty.js"></script>
+    <script src="./js/engines/bridge.js"></script>
+    <script src="./js/xiangqi.js"></script>
+    <script src="./js/xiangqiboard.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>

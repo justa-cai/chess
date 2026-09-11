@@ -1,0 +1,177 @@
+#ai-panel {
+  width: var(--panel-width);
+  height: calc(var(--board-size) + (var(--board-border-size) * 4) + (var(--board-border-size) * 2));
+  box-sizing: border-box;
+  padding: 16px;
+  color: var(--color-text-main);
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-panel-border);
+  box-shadow: var(--color-panel-shadow);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#ai-panel-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#ai-panel-subtitle {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+#ai-table-wrap {
+  margin-top: 14px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+/* 对局操作区：悔棋 / 重开 / 当前难度 */
+#ai-controls {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#ai-controls button {
+  padding: 7px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  background: #3a3f47;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+#ai-controls button:hover {
+  background: #4a505a;
+}
+
+#level-badge {
+  margin-left: auto;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-source-human);
+  background: rgba(244, 208, 111, 0.12);
+  border: 1px solid rgba(244, 208, 111, 0.3);
+  border-radius: var(--radius-btn);
+  white-space: nowrap;
+}
+
+/* 引擎加载进度（首次使用 5~6 档时下载 49MB 权重） */
+#engine-progress {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-btn);
+}
+
+#engine-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#engine-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #78c7ff, #3f8fd0);
+  transition: width 0.2s linear;
+}
+
+#engine-progress-text {
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+#ai-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#ai-stats-table th,
+#ai-stats-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+
+#ai-stats-table th:nth-child(1), #ai-stats-table td:nth-child(1) { width: 5%; text-align: center; }  /* # */
+#ai-stats-table th:nth-child(2), #ai-stats-table td:nth-child(2) { width: 6%; text-align: center; }  /* 方 */
+#ai-stats-table th:nth-child(3), #ai-stats-table td:nth-child(3) { width: 11%; text-align: center; } /* 来源 */
+#ai-stats-table th:nth-child(4), #ai-stats-table td:nth-child(4) { width: 13%; text-align: center; } /* 落子 */
+#ai-stats-table th:nth-child(5), #ai-stats-table td:nth-child(5) { width: 26%; text-align: right; }  /* 节点 */
+#ai-stats-table th:nth-child(6), #ai-stats-table td:nth-child(6) { width: 23%; text-align: right; }  /* NPS */
+#ai-stats-table th:nth-child(7), #ai-stats-table td:nth-child(7) { width: 10%; text-align: right; }  /* 耗时 */
+#ai-stats-table th:nth-child(8), #ai-stats-table td:nth-child(8) { width: 6%; text-align: right; }   /* 分数 */
+
+#ai-stats-table th {
+  position: sticky;
+  top: 0;
+  color: #b8bfcc;
+  background: var(--color-panel-bg);
+  font-weight: 700;
+  z-index: 10;
+}
+
+#ai-stats-table tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+#ai-stats-empty td {
+  color: #9aa2af;
+  text-align: center;
+  padding: 24px 0;
+}
+
+#ai-current {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d8deea;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* 分数与来源高亮样式 */
+.score-positive {
+  color: var(--color-score-positive);
+  font-weight: 600;
+}
+
+.score-negative {
+  color: var(--color-score-negative);
+  font-weight: 600;
+}
+
+.score-neutral {
+  color: var(--color-score-neutral);
+}
+
+.source-ai {
+  color: var(--color-source-ai);
+  font-weight: 700;
+}
+
+.source-human {
+  color: var(--color-source-human);
+  font-weight: 700;
+}

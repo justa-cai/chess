@@ -1,0 +1,50 @@
+#content #content-title .title-counter {
+  margin: 0 20px;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-badge);
+  font-size: 22px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 1px;
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+              inset 6px 6px 9px rgba(255, 255, 255, 0.3),
+              inset -6px -6px 9px rgba(0, 0, 0, 0.6);
+  transition: var(--transition-normal);
+}
+
+#black-counter {
+  background: radial-gradient(circle at 30% 30%, #555555, #111111);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+#red-counter {
+  background: radial-gradient(circle at 30% 30%, #d32f2f, #680000);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+#content #content-title #title {
+  font-size: 52px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  letter-spacing: 2px;
+}
+
+#content #content-title #title span {
+  margin: 0 10px;
+}
+
+#content #content-title #title .title-red {
+  color: #e53935;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(229, 57, 53, 0.3);
+}
+
+#content #content-title #title .title-black {
+  color: #111111;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 255, 255, 0.3);
+}

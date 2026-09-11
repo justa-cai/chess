@@ -1,0 +1,114 @@
+#border-frame {
+  position: relative;
+  width: calc(var(--board-size) + var(--board-border-size) * 4);
+  height: calc(var(--board-size) + var(--board-border-size) * 4);
+  background: #4a4a4a;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+#board-container {
+  width: var(--board-size);
+  height: var(--board-size);
+  position: relative;
+  background-color: #e2b67d;
+  border-radius: 4px;
+}
+
+/* 浮动菜单遮罩层 (与 ui_example 交互一致) */
+#board-options {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition-normal);
+}
+
+.board-option-type {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.board-option-type-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.board-option-type-btn {
+  width: 200px;
+  height: 54px;
+  background: linear-gradient(180deg, #3a3f47 0%, #282c34 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-btn);
+  color: var(--color-text-main);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.board-option-type-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #484e58 0%, #323742 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.board-option-type-btn h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.returnbtn {
+  position: absolute;
+  bottom: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+/* 难度选择菜单：六个档位排成两列，避免把菜单撑得过高 */
+#menu-level-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 14px;
+}
+
+#menu-level-content .level-btn {
+  width: 150px;
+  height: 48px;
+}
+
+#menu-level-content .level-btn h1 {
+  font-size: 18px;
+  letter-spacing: 3px;
+}
+
+#menu-level-hint {
+  position: absolute;
+  bottom: 86px;
+  width: 80%;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.62);
+}
