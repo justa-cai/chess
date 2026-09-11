@@ -2,6 +2,10 @@
 
 [English Version](README.md) | **中文文档**
 
+> **在线试玩：<https://justa-cai.github.io/chess/>**
+> 档位 1~3 点开即玩，不需要下载任何东西；档位 4~6 首次会拉取 49MB 神经网络权重
+> （一般网络约 15 秒），之后由浏览器缓存，刷新只需约 1 秒。
+
 一款纯前端、零后端的中国象棋对弈应用：**低难度档位用内置的 JavaScript 引擎即时应着，
 高难度档位切换到编译成 WebAssembly 的 Pikafish 引擎（NNUE 神经网络评估 + 多线程搜索）。**
 
@@ -132,6 +136,18 @@ python3 server.py
 - COOP / COEP 由 `coi-serviceworker.js` 注入（首次访问会自动 reload 一次以激活）；
 - 权重的持久缓存由 Worker 内的 Cache Storage 负责 —— GitHub Pages 对所有资源只发
   `Cache-Control: max-age=600`，只靠 HTTP 缓存的话用户隔十分钟回来就要重下 49MB。
+- 仓库根目录的 `.nojekyll` 用来关掉 Pages 默认的 Jekyll 处理（纯静态站点不需要它）。
+
+### 线上实测（部署在 GitHub Pages 后）
+
+| 项 | 结果 |
+|---|---|
+| `window.crossOriginIsolated` | `true`，`SharedArrayBuffer` 可用 |
+| 侧栏 NPS | 百万量级（单线程只有十万量级），多线程确实生效 |
+| 档位 1~3 首访 | `*.nnue` 请求数 **0** |
+| 档位 4~6 首次加载 | 49MB 用 **15.2 秒**，网络请求中 `.nnue` **恰好 1 次** |
+| 刷新后二次加载 | **1.2 秒**，`.nnue` 请求数 **0**（Cache Storage 命中） |
+| 控制台 | 0 error / 0 warning |
 
 **带宽提醒**：每次首次访问（无缓存）要传 49MB。GitHub Pages 免费版带宽软上限约
 100 GB/月，折算下来约 2000 次首次访问；回访用户有缓存，成本极低。

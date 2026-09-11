@@ -3,6 +3,9 @@
 中国象棋 AI 网页应用。**纯静态**——没有构建步骤、没有依赖安装、没有测试框架，
 改完文件刷新浏览器即生效。
 
+- 线上：<https://justa-cai.github.io/chess/>（GitHub Pages，`master` 分支根目录）
+- 仓库：<https://github.com/justa-cai/chess>
+
 ---
 
 ## 快速命令
@@ -13,6 +16,28 @@ python3 server.py          # 本地开发服务器，http://127.0.0.1:6324/
 
 必须先起服务器（或任何能发 COOP/COEP 响应的 HTTP 服务）再打开页面。
 `file://` 拿不到跨源隔离，Pikafish 的多线程路径起不来（档位 1~3 不受影响）。
+
+---
+
+## 推送
+
+```bash
+git push origin master     # 推送后 Pages 会自动重建，约 1 分钟
+```
+
+用 HTTPS remote（SSH 的 22 端口在本机被透明代理拦掉），凭据走 `gh`：
+
+```bash
+git config credential.https://github.com.helper '!gh auth git-credential'
+```
+
+推送后确认部署：
+
+```bash
+gh api repos/justa-cai/chess/pages/builds/latest --jq '{status, commit: .commit[0:7]}'
+```
+
+页面要等 `status` 变成 `built` 才刷新到新版本。
 
 ---
 
@@ -117,11 +142,18 @@ Pikafish 是 GPL-3.0，编译成 WASM 后随前端一起分发 → 整个产物�
 
 | 平台 | 单文件上限 | 能否放下 49MB 权重 |
 |---|---|---|
-| GitHub Pages | 100 MiB | ✅ |
+| GitHub Pages | 100 MiB | ✅ 当前用的就是这个 |
 | Cloudflare Pages | **25 MiB** | ❌ |
 
 另外 gzip 对权重完全无效（51,585,654 → 51,592,983 字节，反而变大），
 **49MB 就是真实传输量**，唯一的杠杆是缓存。
+
+线上已实测（`master` 分支根目录 + `.nojekyll` 关掉 Jekyll）：
+`crossOriginIsolated === true`、NPS 百万量级、档位 1~3 零 `.nnue` 请求、
+首次加载 49MB 用时 15.2s 且 **`.nnue` 网络请求恰好 1 次**、刷新 1.2s 且 0 次请求。
+
+⚠️ **改 `pikafish.worker.js` 的加载路径后，必须重新在线上验证"首次加载只下一次"** ——
+这条链路（内存 promise → Cache Storage → 网络）的时序很脆，见下面"权重加载"那一节。
 
 ---
 
@@ -270,10 +302,26 @@ PvP 模式下 `app.js` 用 **wukong** 来做终局判定，避免为了判个胜
 
 - 三层查找：会话内内存 `nnueBytesPromise` → Cache Storage → 网络
 - Cache Storage 只是**跨会话**的兜底，内存那份才是"本次会话绝不下第二次"的保证
-  （否则 pre-js 内部那次 fetch 可能赶在 `cache.put` 落盘之前发起 → 49MB 下两遍）
 - 垫片**只拦 `.nnue`**。`.wasm` 必须原样透传 —— 流式编译需要真实的
   `application/wasm` 响应，合成响应会让 `instantiateStreaming` 失败
 - Cache Storage 不可用/超配额时**降级到直接网络请求**，绝不能因此白屏
+
+#### ⚠️ `nnueBytesPromise` 的释放时机（踩过坑，别再改回去）
+
+内存那份字节由 `releaseNnueBytes()` 放掉，**调用点挂在内建层 `readyok` 上**，
+不是 `bootEngine()` 返回之后。
+
+原因是 pre-js 取权重的那次 `fetch` 发生在它自己的 `postRun` 里 ——
+`importScripts('pikafish-engine.js')` 返回时那次 fetch **还没发生**。
+若在 `bootEngine()` 之后同步置空，垫片会当成"第一次请求"再走一遍 `loadNnueBytes`：
+
+- 缓存命中 → 白读一遍 49MB 进内存
+- **缓存未命中 → 可能再下一遍 49MB**（`cache.put` 尚未落盘，`readCachedBytes`
+  返回 null 就直接走网络）
+
+后者会把"内存里留一份"这个设计彻底抵消。这个 bug 真的发生过，
+且**只有看 `LOAD_STAGE` 事件序列才能发现**（正常应恰好 `weights, engine, handshake, ready`
+或 `weights, cached, engine, handshake, ready` 一对；出现两对就是漏了）。
 
 ---
 

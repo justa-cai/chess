@@ -2,6 +2,11 @@
 
 **English** | [中文文档](README_CN.md)
 
+> **Play it now: <https://justa-cai.github.io/chess/>**
+> Levels 1–3 start instantly with nothing to download. Levels 4–6 fetch the 49 MB
+> neural-network weights once (about 15 s on a typical connection), then the browser caches them —
+> reloads take ~1 s.
+
 A pure frontend, zero-backend Chinese Chess (Xiangqi) game: **the lower difficulty levels are
 answered instantly by a built-in JavaScript engine, while the higher levels switch to Pikafish
 compiled to WebAssembly (NNUE neural-network evaluation + multi-threaded search).**
@@ -141,7 +146,20 @@ Static hosting cannot set custom response headers, so:
 - COOP / COEP are injected by `coi-serviceworker.js` (the first visit reloads once to activate it);
 - persistent caching of the weights is handled by Cache Storage inside the worker — GitHub Pages
   serves everything with `Cache-Control: max-age=600`, so relying on the HTTP cache alone would
-  make a user re-download 49 MB after ten minutes away.
+  make a user re-download 49 MB after ten minutes away;
+- `.nojekyll` at the repo root turns off Pages' default Jekyll pass, which a pure static site
+  has no use for.
+
+### Measured on the live deployment (GitHub Pages)
+
+| Check | Result |
+|---|---|
+| `window.crossOriginIsolated` | `true`, `SharedArrayBuffer` available |
+| Sidebar NPS | millions (single-threaded is hundreds of thousands) — threading really is active |
+| Levels 1–3, first visit | **0** `*.nnue` requests |
+| Levels 4–6, first load | 49 MB in **15.2 s**, exactly **1** `.nnue` network request |
+| Reload after that | **1.2 s**, **0** `.nnue` requests (Cache Storage hit) |
+| Console | 0 errors / 0 warnings |
 
 **Bandwidth note**: each first visit without a cache transfers 49 MB. GitHub Pages' free tier has
 a soft limit of roughly 100 GB/month, which works out to about 2,000 first visits; returning
